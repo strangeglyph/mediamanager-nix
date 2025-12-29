@@ -117,7 +117,7 @@
         media-manager = self.outputs.packages."${prev.stdenv.hostPlatform.system}".application;
       };
 
-      modules.default = {
+      nixosModules.default = {
         imports = [ ./module.nix ];
         #config.nixpkgs.overlays = [ self.outputs.overlays.default ];
       };
@@ -130,7 +130,7 @@
             default = pkgs.testers.runNixOSTest {
               name = "mediamanager integration test";
               nodes.machine = { config, pkgs, ...}: {
-                imports = [ self.outputs.modules.default ];
+                imports = [ self.outputs.nixosModules.default ];
                 config = {
                   services.media-manager = {
                     enable = true;
