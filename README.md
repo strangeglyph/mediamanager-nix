@@ -39,7 +39,7 @@ file. See the [example configuration file upstream](https://github.com/maxdornin
 and the [upstream documentation](https://maxdorninger.github.io/MediaManager/configuration.html) for reference. Secrets can 
 be passed as environment variables via `service.media-manager.environmentFile`; see the 
 [upstream documentation](https://maxdorninger.github.io/MediaManager/configuration.html#configuring-secrets) for the 
-naming scheme.
+naming scheme. Note that the env variables can contain JSON, relevant if the setting expects e.g. a list.
 
 As a convenience, if `service.media-manager.postgres.enable` is set then a suitable local postgres database and user 
 is created. The default database settings in `service.media-manager.settings` work with these.
