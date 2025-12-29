@@ -202,6 +202,7 @@ in
         User = cfg.user;
         Group = cfg.group;
         Restart = "always";
+        RestartSec = "5s";
       };
     };
 
