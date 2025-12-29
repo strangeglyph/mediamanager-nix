@@ -52,13 +52,6 @@ in
         default = 8000;
       };
 
-      root-path = mkOption {
-        description = "If MediaManager is served under a sub path (e.g. https://example.com/mediamanager), set it here";
-        type = types.nullOr types.str;
-        default = null;
-        example = "/mediamanager";
-      };
-
       environmentFile = mkOption {
         description = ''
           Path to file storing environment variables to be passed to the service.
@@ -181,8 +174,7 @@ in
         ${lib.getExe cfg.package} \
           --host ${cfg.host} \
           --port ${toString cfg.port} \
-          --proxy-headers \
-          ${lib.optionalString (cfg.root-path != null) cfg.root-path}
+          --proxy-headers
       '';
       
       unitConfig = {
