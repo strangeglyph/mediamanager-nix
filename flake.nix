@@ -99,21 +99,11 @@
                             venvIgnoreCollisions = old.venvIgnoreCollisions ++ [ "*/fastapi" ];
                           });
 
-          # TODO this is an awful hack 
-          application = pkgs.writeShellScriptBin "mediamanager" ''
-              set -euo pipefail
-              
-              source ${mm-pkgs.virtual-env}/bin/activate
-              
-              (cd ${media-manager} && python -m alembic upgrade head)
-              python -m fastapi run ${mm-pkgs.virtual-env}/lib/python3.13/site-packages/media_manager/main.py $@ 
-            '';
-
           assets = pkgs.runCommand "media-manager-assets" {} ''
-            mkdir -p $out/share
+            mkdir -p $out/assets
 
-            cp -r ${media-manager}/alembic $out/share/alembic
-            cp ${media-manager}/alembic.ini $out/share/alembic.ini
+            cp -r ${media-manager}/alembic $out/assets/alembic
+            cp ${media-manager}/alembic.ini $out/assets/alembic.ini
           '';
 
           frontend = pkgs.buildNpmPackage rec {
@@ -134,6 +124,11 @@
               BASE_PATH = "${path_prefix}/web";
               PUBLIC_VERSION = version;
             };
+
+            postInstall = ''
+              mkdir -p $out/assets
+              cp -r build $out/assets/frontend
+            '';
           };
 
           default = pkgs.symlinkJoin {
@@ -144,7 +139,7 @@
               mm-pkgs.frontend
 
               (pkgs.writeShellScriptBin "media-manager-run-migrations" ''
-                cd ${mm-pkgs.assets}/share
+                cd ${mm-pkgs.assets}/assets
                 ${mm-pkgs.virtual-env}/bin/alembic upgrade head
               '')
 

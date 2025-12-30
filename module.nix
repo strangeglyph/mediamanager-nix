@@ -19,6 +19,7 @@ in
       };
       
       package = mkPackageOption pkgs "MediaManager" { 
+        default = pkgs.media-manager;
       };
       
       user = mkOption {
@@ -162,6 +163,8 @@ in
       environment = {
         CONFIG_FILE = settings-file;
         LOG_FILE = "/var/log/media-manager/log.json";
+        PUBLIC_VERSION = cfg.package.version;
+        FRONTEND_FILES_DIR = "${cfg.package}/assets/frontend";
       };
 
       script = ''
