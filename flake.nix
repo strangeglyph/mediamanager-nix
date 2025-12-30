@@ -90,6 +90,7 @@
         let
           pythonSet = pythonSets.${system};
           pkgs = nixpkgs.legacyPackages.${system};
+          mm-pkgs = self.outputs.packages.${system};
           inherit (pkgs.callPackages pyproject-nix.build.util { }) mkApplication;
         in
         {
@@ -97,24 +98,67 @@
                           .overrideAttrs (old: {
                             venvIgnoreCollisions = old.venvIgnoreCollisions ++ [ "*/fastapi" ];
                           });
+
           # TODO this is an awful hack 
-          application = 
-            let 
-              venv = self.outputs.packages."${system}".virtual-env; 
-            in pkgs.writeShellScriptBin "mediamanager" ''
+          application = pkgs.writeShellScriptBin "mediamanager" ''
               set -euo pipefail
               
-              source ${venv}/bin/activate
+              source ${mm-pkgs.virtual-env}/bin/activate
               
               (cd ${media-manager} && python -m alembic upgrade head)
-              python -m fastapi run ${venv}/lib/python3.13/site-packages/media_manager/main.py $@ 
+              python -m fastapi run ${mm-pkgs.virtual-env}/lib/python3.13/site-packages/media_manager/main.py $@ 
             '';
-          default = self.outputs.packages."${system}".application;
+
+          assets = pkgs.runCommand "media-manager-assets" {} ''
+            mkdir -p $out/share
+
+            cp -r ${media-manager}/alembic $out/share/alembic
+            cp ${media-manager}/alembic.ini $out/share/alembic.ini
+          '';
+
+          frontend = pkgs.buildNpmPackage rec {
+            pname = "mediamanager-frontend";
+            version = "0.0.0-nix";
+
+            src = "${media-manager}/web";
+            npmDeps = pkgs.importNpmLock {
+              npmRoot = "${media-manager}/web";
+            };
+
+            npmConfigHook = pkgs.importNpmLock.npmConfigHook;
+
+            path_prefix = "";
+            
+            env = {
+              PUBLIC_API_URL = "${path_prefix}";
+              BASE_PATH = "${path_prefix}/web";
+              PUBLIC_VERSION = version;
+            };
+          };
+
+          default = pkgs.symlinkJoin {
+            name = "media-manager";
+            paths = [
+              mm-pkgs.virtual-env
+              mm-pkgs.assets
+              mm-pkgs.frontend
+
+              (pkgs.writeShellScriptBin "media-manager-run-migrations" ''
+                cd ${mm-pkgs.assets}/share
+                ${mm-pkgs.virtual-env}/bin/alembic upgrade head
+              '')
+
+              (pkgs.writeShellScriptBin "media-manager-launch" ''
+                LOCATION=$(${mm-pkgs.virtual-env}/bin/python -c 'import media_manager; print(media_manager.__file__)')
+                ${mm-pkgs.virtual-env}/bin/fastapi run $(dirname $LOCATION)/main.py $@
+              '')
+            ];
+          };
         }
       );
 
       overlays.default = final: prev: {
-        media-manager = self.outputs.packages."${prev.stdenv.hostPlatform.system}".application;
+        media-manager = self.outputs.packages."${prev.stdenv.hostPlatform.system}".default;
       };
 
       nixosModules.default = {
@@ -134,8 +178,9 @@
                 config = {
                   services.media-manager = {
                     enable = true;
-                    package = self.outputs.packages."${system}".application;
+                    package = self.outputs.packages."${system}".default;
                     postgres.enable = true;
+                    port = 12345;
                     dataDir = "/tmp"; 
                   };
                   

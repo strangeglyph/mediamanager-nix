@@ -19,7 +19,6 @@ in
       };
       
       package = mkPackageOption pkgs "MediaManager" { 
-        #default = pkgs.media-manager;
       };
       
       user = mkOption {
@@ -170,9 +169,11 @@ in
           || MEDIAMANAGER_AUTH__TOKEN_SECRET=$(${lib.getExe pkgs.openssl} rand -hex 64)
 
         export MEDIAMANAGER_AUTH__TOKEN_SECRET
+
+        ${cfg.package}/bin/media-manager-run-migrations
         
-        ${lib.getExe cfg.package} \
-          --host ${cfg.host} \
+        ${cfg.package}/bin/media-manager-launch \
+          --host '${cfg.host}' \
           --port ${toString cfg.port} \
           --proxy-headers
       '';

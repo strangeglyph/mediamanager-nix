@@ -16,9 +16,13 @@ inputs.mediamanager-nix = {
 If you just want the application:
 
 - `mediamanager-nix.packages.${your-system}.virtual-env` contains the virtual env with all dependencies
-- `mediamanager-nix.packages.${your-system}.application` is a wrapper script that performs the database migrations
-  and then launch the server. 
-- `mediamanager-nix.packages.${your-system}.default` is the same as `application`.
+- `mediamanager-nix.packages.${your-system}.frontend` contains the web frontend
+- `mediamanager-nix.packages.${your-system}.assets` contains other required assets such as database migrations
+- `mediamanager-nix.packages.${your-system}.default` contains all of the above as well as two wrapper scripts:
+  - `media-manager-run-migrations` runs the database migrations
+  - `media-manager-launch` uses fastapi to launch the backend
+  Neither of the wrapper script will work properly without some necessary configuration, see module implementation
+  for details
 
 To use the nixos module, import it:
 
@@ -31,7 +35,7 @@ imports = [
 Right now the package isn't provided as an overlay, so you need to manually assign it:
 
 ```nix
-services.media-manager.package = mediamanager-nix.packages."${system}".application;
+services.media-manager.package = mediamanager-nix.packages."${system}".default;
 ```
 
 After that, use as any other service. The option `service.media-manager.settings` is free-form and generates the config
