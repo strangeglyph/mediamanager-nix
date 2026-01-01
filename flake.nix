@@ -133,6 +133,8 @@
 
           default = pkgs.symlinkJoin {
             name = "media-manager";
+            version = mm-pkgs.frontend.version;
+
             paths = [
               mm-pkgs.virtual-env
               mm-pkgs.assets
@@ -158,7 +160,7 @@
 
       nixosModules.default = {
         imports = [ ./module.nix ];
-        #config.nixpkgs.overlays = [ self.outputs.overlays.default ];
+        config.nixpkgs.overlays = [ self.outputs.overlays.default ];
       };
 
       checks = forAllSystems (system:
@@ -168,6 +170,7 @@
           {
             default = pkgs.testers.runNixOSTest {
               name = "mediamanager integration test";
+              node.pkgsReadOnly = false;
               nodes.machine = { config, pkgs, ...}: {
                 imports = [ self.outputs.nixosModules.default ];
                 config = {
@@ -176,7 +179,10 @@
                     package = self.outputs.packages."${system}".default;
                     postgres.enable = true;
                     port = 12345;
-                    dataDir = "/tmp"; 
+                    dataDir = "/tmp";
+                    settings = {
+                      misc.frontend_url = "http://[::1]:12345";
+                    };
                   };
                   
                   systemd.tmpfiles.settings."10-mediamanager" = {

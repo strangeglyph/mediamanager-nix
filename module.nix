@@ -199,6 +199,7 @@ in
         Group = cfg.group;
         Restart = "always";
         RestartSec = "5s";
+        Type = "simple";
       };
     };
 
