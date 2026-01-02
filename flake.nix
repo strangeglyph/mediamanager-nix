@@ -80,17 +80,6 @@
               pyproject-build-systems.overlays.wheel
               overlay
               overrides
-              (final: prev: {
-                mediamanager = prev.mediamanager.overrideAttrs (old: {
-                  patches =  (old.patches or []) ++ [
-                    (pkgs.fetchpatch2 {
-                      name = "allow-following-symlinks-in-frontend-dir.patch";
-                      url = "https://github.com/strangeglyph/MediaManager/commit/64f01cc9197b41de5895691aae6da9a13449ab5b.patch?full_index=1";
-                      hash = "sha256-qpBuuhDNMbH7c9K1G8LgF/Cta990t5rtUXmLsq4D+VY=";
-                    })
-                  ];
-                });
-              })
             ]
           )
       );

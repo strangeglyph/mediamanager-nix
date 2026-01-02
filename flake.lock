@@ -3,11 +3,11 @@
     "media-manager": {
       "flake": false,
       "locked": {
-        "lastModified": 1767042854,
-        "narHash": "sha256-t8/CtIdWpbsv7EvxRtds+WBfy1eHo0hTz2PfHP+RvzI=",
+        "lastModified": 1767373218,
+        "narHash": "sha256-kMFxhRYhNTqmcB9uJV44FM9oAa4Wa+Vi4LQPnhEpUZ0=",
         "owner": "maxdorninger",
         "repo": "MediaManager",
-        "rev": "d3e12579ac30b08f7b46a5dce7930afd8152a7a5",
+        "rev": "d420a2714c28f3d6a5651c437cfb8f2300463ed2",
         "type": "github"
       },
       "original": {
