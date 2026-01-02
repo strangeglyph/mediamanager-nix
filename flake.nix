@@ -195,6 +195,12 @@
               };
               testScript = { nodes, ... }: ''
                 machine.wait_for_unit("media-manager.service")
+                machine.wait_for_open_port(12345)
+                
+                api_result = machine.succeed("curl --fail 'http://[::1]:12345/api/v1/health'")
+                assert "Hello World!" in api_result
+
+                frontend_result = machine.succeed("curl --fail 'http://[::1]:12345/web/favicon.ico'")
               '';
             };
           }
