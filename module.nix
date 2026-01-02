@@ -165,6 +165,7 @@ in
         LOG_FILE = "/var/log/media-manager/log.json";
         PUBLIC_VERSION = cfg.package.version;
         FRONTEND_FILES_DIR = "${cfg.package}/assets/frontend";
+        FRONTEND_FOLLOW_SYMLINKS = "true";
       };
 
       script = ''
