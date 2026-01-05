@@ -176,7 +176,6 @@
                 config = {
                   services.media-manager = {
                     enable = true;
-                    package = self.outputs.packages."${system}".default;
                     postgres.enable = true;
                     port = 12345;
                     dataDir = "/tmp";

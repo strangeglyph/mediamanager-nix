@@ -19,7 +19,7 @@ in
       };
       
       package = mkPackageOption pkgs "MediaManager" { 
-        default = pkgs.media-manager;
+        default = [ "media-manager" ];
       };
       
       user = mkOption {

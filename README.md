@@ -32,12 +32,6 @@ imports = [
 ];
 ```
 
-Known issue: The module overlay does not apply properly. Set the service package explicitly:
-
-```
-package = mediamanager-nix.packages."${your-system}".default;
-```
-
 Use as any other service. The option `service.media-manager.settings` is free-form and generates the config
 file. See the [example configuration file upstream](https://github.com/maxdorninger/MediaManager/blob/master/config.example.toml) 
 and the [upstream documentation](https://maxdorninger.github.io/MediaManager/configuration.html) for reference. Secrets can 
