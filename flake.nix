@@ -5,7 +5,7 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     media-manager = {
-      url = "github:maxdorninger/MediaManager";
+      url = "github:maxdorninger/MediaManager?ref=tags/v1.12.1";
       flake = false;
     };
 
@@ -108,7 +108,7 @@
 
           frontend = pkgs.buildNpmPackage rec {
             pname = "mediamanager-frontend";
-            version = "0.0.0-nix";
+            version = "1.12.1-nix";
 
             src = "${media-manager}/web";
             npmDeps = pkgs.importNpmLock {
