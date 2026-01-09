@@ -181,6 +181,35 @@
                     dataDir = "/tmp";
                     settings = {
                       misc.frontend_url = "http://[::1]:12345";
+                      indexers.title_scoring_rules = [
+                        {
+                          name = "prefer_h265";
+                          keywords = [ "h265"  "hevc" "x265" ];
+                          score_modifier = 100;
+                          negate = false;
+                        }
+                        {
+                          name = "avoid_cam";
+                          keywords = [ "cam"  "ts" ];
+                          score_modifier = -10000;
+                          negate = false;
+                        }
+                      ];
+                      indexers.indexer_flag_scoring_rules = [
+                        {
+                          name = "reject_nuked";
+                          flags = ["nuked"];
+                          score_modifier = -10000;
+                          negate = false;
+                        }
+                      ];
+                      indexers.scoring_rule_sets = [
+                        {
+                          name = "default";
+                          libraries = [ "ALL_TV" "ALL_MOVIES" ];
+                          rule_names = [ "prefer_h265" "avoid_cam" "reject_nuked" ];
+                        }
+                      ];
                     };
                   };
                   

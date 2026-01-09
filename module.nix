@@ -6,10 +6,34 @@ let
     mkEnableOption
     mkIf
     types;
+  inherit (builtins)
+    elem
+    head
+    tail
+    map
+    filter
+    length;
+
   cfg = config.services.media-manager;
 
   settings-format = pkgs.formats.toml {};
   settings-file = settings-format.generate "config.toml" cfg.settings;
+
+  rules = (cfg.settings.indexers.title_scoring_rules or []) 
+          ++ (cfg.settings.indexers.indexer_flag_scoring_rules or []);
+  rule-names = lib.catAttrs "name" rules;
+  
+  duplicates = list:
+                if length list <= 1 then [] else (
+                  (if elem (head list) (tail list) then [ (head list) ] else []) 
+                  ++ (duplicates (tail list))
+                );
+
+  rule-sets = cfg.settings.indexers.scoring_rule_sets or [];
+  rule-set-names = lib.catAttrs "name" rule-sets;
+  
+  rule-set-undefined-rules = rule-set: filter (name: ! (elem name rule-names)) rule-set.rule_names;
+  rule-sets-with-undefined-rules = filter (rs: length (rule-set-undefined-rules rs) != 0) rule-sets;  
 in
 {
   options = {
@@ -139,6 +163,33 @@ in
   };
 
   config = mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = length (duplicates rule-names) == 0;
+        message = let
+          error-info = lib.concatMapStrings (name: "  - ${name}\n") (duplicates rule-names);
+        in
+          "mediamanager-nix: The following rules were defined multiple times:\n${error-info}";
+      }
+      {
+        assertion = length (duplicates rule-set-names) == 0;
+        message = let
+          error-info = lib.concatMapStrings (name: "  - ${name}\n") (duplicates rule-set-names);
+        in
+          "mediamanager-nix: The following rule sets were defined multiple times:\n${error-info}";
+      }
+      {
+        assertion = length (rule-sets-with-undefined-rules) == 0;
+        message = let
+          print-rules = rs: lib.concatMapStrings (name: "${name} ") (rule-set-undefined-rules rs);
+          error-info = lib.concatMapStrings 
+            (rs: "  - [ ${print-rules rs}] in rule set ${rs.name}\n") 
+            rule-sets-with-undefined-rules;
+          in
+            "mediamanager-nix: The following rule sets are referring to undefined rules:\n${error-info}";
+      }
+    ];
+
     users.users = lib.optionalAttrs (cfg.user == "media-manager") {
       media-manager = {
         isSystemUser = true;
