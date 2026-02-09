@@ -3,15 +3,16 @@
     "media-manager": {
       "flake": false,
       "locked": {
-        "lastModified": 1767373218,
-        "narHash": "sha256-kMFxhRYhNTqmcB9uJV44FM9oAa4Wa+Vi4LQPnhEpUZ0=",
+        "lastModified": 1770577806,
+        "narHash": "sha256-FCloFly4mPXSJxMJVJsjnZvCDEEyQ7y+nVtdhnrJBYk=",
         "owner": "maxdorninger",
         "repo": "MediaManager",
-        "rev": "d420a2714c28f3d6a5651c437cfb8f2300463ed2",
+        "rev": "b5b297e99abebe03a826f1204eea9e7a25f0fa13",
         "type": "github"
       },
       "original": {
         "owner": "maxdorninger",
+        "ref": "tags/v1.12.2",
         "repo": "MediaManager",
         "type": "github"
       }
